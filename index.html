@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberSage — Threat Intelligence Training</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+:root {
+  --bg:        #0e0e10;
+  --bg2:       #121214;
+  --bg3:       #18181c;
+  --glass:     rgba(255,255,255,0.04);
+  --glass2:    rgba(255,255,255,0.07);
+  --border:    rgba(255,255,255,0.08);
+  --border2:   rgba(255,255,255,0.12);
+  --text:      #f0f0f2;
+  --text2:     #a0a0aa;
+  --text3:     #606068;
+  --red:       #ff453a;
+  --red-soft:  rgba(255,69,58,0.12);
+  --red-glow:  rgba(255,69,58,0.25);
+  --green:     #30d158;
+  --green-soft:rgba(48,209,88,0.10);
+  --amber:     #ffd60a;
+  --amber-soft:rgba(255,214,10,0.10);
+  --blue:      #0a84ff;
+  --blue-soft: rgba(10,132,255,0.10);
+  --purple:    #bf5af2;
+  --radius:    16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+  --font:      'Inter', -apple-system, system-ui, sans-serif;
+  --ease:      cubic-bezier(0.4,0,0.2,1);
+  --spring:    cubic-bezier(0.34,1.56,0.64,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-feature-settings: 'cv02','cv03','cv04','cv11';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  background: rgba(14,14,16,0.8);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.logo-mark {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, #0a84ff 0%, #bf5af2 100%);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.1) inset;
+}
+
+.logo-name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--text);
+}
+
+.logo-version {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text3);
+  background: var(--glass2);
+  border: 1px solid var(--border);
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+
+.topbar-sep { width: 1px; height: 18px; background: var(--border2); margin: 0 4px; }
+
+.live-badge {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 500;
+  color: var(--green);
+  letter-spacing: 0.02em;
+}
+
+.live-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: livePulse 2s ease infinite;
+}
+
+@keyframes livePulse {
+  0%,100% { opacity:1; box-shadow: 0 0 6px var(--green); }
+  50% { opacity:0.5; box-shadow: 0 0 2px var(--green); }
+}
+
+.topbar-right {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 10px;
+}
+
+.score-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+}
+
+.score-pill strong {
+  color: var(--text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: var(--text3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── LAYOUT ── */
+.shell {
+  display: flex;
+  height: 100vh;
+  padding-top: 56px;
+}
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  width: 248px;
+  flex-shrink: 0;
+  background: rgba(18,18,20,0.6);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-section {
+  padding: 20px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 12px;
+}
+
+.profile-block {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.profile-av {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1c1c3a, #2c1c3a);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.profile-info .p-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+.profile-info .p-role {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 1px;
+}
+
+.left-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 12px;
+}
+.left-body::-webkit-scrollbar { width: 0; }
+
+.section-head {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  padding: 0 4px;
+  margin: 16px 0 6px;
+}
+.section-head:first-child { margin-top: 4px; }
+
+.scenario-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s var(--ease);
+  border: 1px solid transparent;
+  margin-bottom: 2px;
+  position: relative;
+}
+
+.scenario-row:hover { background: var(--glass); }
+
+.scenario-row.active {
+  background: var(--glass2);
+  border-color: var(--border2);
+}
+
+.scenario-row.done .sr-title { color: var(--text3); }
+.scenario-row.done::after {
+  content: '';
+  position: absolute; right: 10px; top: 50%;
+  transform: translateY(-50%);
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--green-soft);
+  border: 1px solid var(--green);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.sr-icon {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.sr-info { flex: 1; min-width: 0; }
+.sr-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  letter-spacing: -0.1px;
+}
+
+.sr-meta {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 1px;
+}
+
+.diff-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stat-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.stat-tile {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 11px;
+}
+
+.stat-tile .sv {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.stat-tile .sl {
+  font-size: 10px;
+  color: var(--text3);
+  font-weight: 500;
+}
+
+/* ── MAIN ── */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Tabs */
+.tab-bar {
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  flex-shrink: 0;
+}
+
+.tab-btn {
+  padding: 14px 14px 13px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text3);
+  cursor: pointer;
+  border-bottom: 1.5px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  user-select: none;
+}
+.tab-btn:hover { color: var(--text2); }
+.tab-btn.active { color: var(--text); border-bottom-color: var(--text); }
+
+/* Views */
+.view { display: none; flex: 1; overflow: hidden; }
+.view.active { display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── SETUP VIEW ── */
+.setup-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px 28px;
+}
+.setup-scroll::-webkit-scrollbar { width: 0; }
+
+.setup-hero {
+  max-width: 560px;
+  margin: 0 auto 36px;
+  text-align: center;
+}
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 500;
+  color: var(--blue);
+  background: var(--blue-soft);
+  border: 1px solid rgba(10,132,255,0.2);
+  padding: 4px 12px; border-radius: 20px;
+  margin-bottom: 18px;
+  letter-spacing: 0.02em;
+}
+
+.setup-hero h1 {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  line-height: 1.15;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.setup-hero p {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.65;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 680px;
+  margin: 0 auto 20px;
+}
+
+.form-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: border-color 0.2s;
+}
+.form-card:hover { border-color: var(--border2); }
+
+.fc-head {
+  display: flex; align-items: center; gap: 9px;
+  margin-bottom: 16px;
+}
+
+.fc-icon {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+}
+
+.fc-head h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+.field { margin-bottom: 12px; }
+.field:last-child { margin-bottom: 0; }
+
+.field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text3);
+  margin-bottom: 5px;
+  letter-spacing: 0.02em;
+}
+
+.field input, .field select {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 8px 11px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-appearance: none;
+}
+.field input:focus, .field select:focus {
+  border-color: var(--blue);
+  background: rgba(10,132,255,0.05);
+}
+.field input::placeholder { color: var(--text3); }
+.field select option { background: #1c1c1e; }
+
+.setup-cta {
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex; gap: 10px;
+}
+
+.btn-ghost {
+  padding: 11px 20px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 500;
+  font-family: var(--font);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-ghost:hover { background: var(--glass); color: var(--text); }
+
+.btn-cta {
+  flex: 1;
+  padding: 11px 20px;
+  background: var(--text);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600;
+  font-family: var(--font);
+  color: var(--bg);
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn-cta:hover { opacity: 0.92; }
+.btn-cta:active { transform: scale(0.99); }
+.btn-cta:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── GAME VIEW ── */
+.game-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  overflow: hidden;
+}
+
+/* Content pane */
+.content-pane {
+  overflow-y: auto;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.content-pane::-webkit-scrollbar { width: 0; }
+
+.scenario-eyebrow {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 18px;
+}
+
+.type-badge {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.tb-phishing  { background: var(--red-soft);   color: var(--red);    border: 1px solid rgba(255,69,58,0.2); }
+.tb-social    { background: var(--amber-soft);  color: var(--amber);  border: 1px solid rgba(255,214,10,0.2); }
+.tb-vishing   { background: var(--blue-soft);   color: var(--blue);   border: 1px solid rgba(10,132,255,0.2); }
+.tb-pretexting{ background: rgba(191,90,242,0.1); color: var(--purple); border: 1px solid rgba(191,90,242,0.2); }
+
+.scenario-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--text);
+}
+
+/* Email card */
+.email-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 20px 40px rgba(0,0,0,0.2);
+  animation: cardIn 0.35s var(--spring);
+}
+
+@keyframes cardIn {
+  from { opacity:0; transform: translateY(8px) scale(0.99); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+
+.email-chrome {
+  background: rgba(255,255,255,0.025);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.chrome-dots { display: flex; gap: 5px; }
+.chrome-dot  { width: 10px; height: 10px; border-radius: 50%; }
+
+.chrome-label {
+  font-size: 11px;
+  color: var(--text3);
+  margin-left: 4px;
+  font-weight: 500;
+}
+
+.email-meta {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 7px;
+}
+
+.meta-row {
+  display: flex; align-items: baseline; gap: 0;
+}
+
+.meta-key {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text3);
+  width: 58px;
+  flex-shrink: 0;
+  letter-spacing: 0.01em;
+}
+
+.meta-val {
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+  line-height: 1.4;
+}
+
+.meta-val.warn {
+  color: var(--amber);
+}
+
+.subject-row .meta-val {
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.2px;
+}
+
+.email-body-wrap {
+  padding: 24px 22px 28px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text2);
+}
+
+.email-body-wrap p { margin-bottom: 14px; }
+.email-body-wrap p:last-child { margin-bottom: 0; }
+
+.email-link {
+  color: var(--blue);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(10,132,255,0.3);
+  padding-bottom: 1px;
+  transition: border-color 0.15s;
+}
+.email-link:hover { border-color: var(--blue); }
+
+.email-actions {
+  padding: 14px 22px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 8px;
+  background: rgba(255,255,255,0.015);
+}
+
+.email-act-btn {
+  padding: 6px 14px;
+  border-radius: var(--radius-xs);
+  font-size: 12px; font-weight: 500;
+  font-family: var(--font);
+  cursor: pointer; border: none;
+  transition: all 0.15s;
+}
+.eab-reply   { background: rgba(10,132,255,0.15); color: var(--blue); }
+.eab-fwd     { background: var(--glass); color: var(--text2); border: 1px solid var(--border); }
+.eab-delete  { background: var(--red-soft); color: var(--red); }
+.email-act-btn:hover { opacity: 0.75; }
+
+/* Chat card */
+.chat-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 20px 40px rgba(0,0,0,0.2);
+  animation: cardIn 0.35s var(--spring);
+}
+
+.chat-chrome {
+  background: rgba(255,255,255,0.025);
+  border-bottom: 1px solid var(--border);
+  padding: 13px 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+
+.chat-av {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple), var(--blue));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+}
+
+.chat-chrome-info .cc-name {
+  font-size: 13px; font-weight: 600; color: var(--text);
+}
+.chat-chrome-info .cc-status {
+  font-size: 11px; color: var(--green);
+}
+
+.chat-messages {
+  padding: 18px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.cm { display: flex; gap: 8px; }
+.cm.you { flex-direction: row-reverse; }
+
+.cm-av {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; flex-shrink: 0; margin-top: 2px;
+}
+.cm-av.them-av { background: rgba(191,90,242,0.2); }
+.cm-av.you-av  { background: rgba(10,132,255,0.2); }
+
+.cm-bubble {
+  max-width: 75%;
+  padding: 9px 13px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.them .cm-bubble {
+  background: var(--glass2);
+  border-radius: 3px 14px 14px 14px;
+}
+.you .cm-bubble {
+  background: var(--blue-soft);
+  border: 1px solid rgba(10,132,255,0.2);
+  border-radius: 14px 3px 14px 14px;
+}
+
+/* ── ANALYSIS PANEL ── */
+.analysis-panel {
+  background: rgba(18,18,20,0.5);
+  backdrop-filter: blur(40px) saturate(150%);
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.ap-header {
+  padding: 20px 18px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.ap-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 4px;
+}
+
+.ap-subtitle {
+  font-size: 12px;
+  color: var(--text3);
+  line-height: 1.5;
+}
+
+.ap-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+.ap-body::-webkit-scrollbar { width: 0; }
+
+/* Indicator cards */
+.indicator-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+
+.indicator-card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 13px;
+  display: flex; align-items: flex-start; gap: 10px;
+  transition: border-color 0.2s, background 0.2s;
+  cursor: default;
+  animation: indicatorIn 0.3s var(--ease) both;
+}
+
+@keyframes indicatorIn {
+  from { opacity:0; transform:translateX(8px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+
+.indicator-card:nth-child(2) { animation-delay: 0.05s; }
+.indicator-card:nth-child(3) { animation-delay: 0.10s; }
+.indicator-card:nth-child(4) { animation-delay: 0.15s; }
+
+.indicator-card:hover {
+  border-color: var(--border2);
+  background: var(--glass2);
+}
+
+.ic-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.ic-body { flex: 1; min-width: 0; }
+.ic-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 2px;
+  letter-spacing: -0.1px;
+}
+.ic-desc {
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.4;
+}
+
+/* Confidence */
+.conf-section { margin-bottom: 18px; }
+
+.conf-header {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 8px;
+}
+
+.conf-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+.conf-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+input[type=range] {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  background: var(--border2);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 0 0 3px rgba(240,240,242,0.15);
+  transition: box-shadow 0.15s;
+}
+input[type=range]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 5px rgba(240,240,242,0.2);
+}
+
+/* Verdict buttons */
+.verdict-section { margin-bottom: 12px; }
+
+.verdict-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+
+.verdict-btn {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: all 0.2s var(--ease);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: -0.1px;
+}
+
+.verdict-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at center, white 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.verdict-btn:active::before { opacity: 0.06; }
+
+.vb-threat {
+  background: var(--red-soft);
+  color: var(--red);
+  border-color: rgba(255,69,58,0.25);
+}
+.vb-threat:not(:disabled):hover {
+  background: rgba(255,69,58,0.18);
+  border-color: rgba(255,69,58,0.4);
+  box-shadow: 0 0 20px var(--red-glow);
+  transform: translateY(-1px);
+}
+
+.vb-legit {
+  background: var(--green-soft);
+  color: var(--green);
+  border-color: rgba(48,209,88,0.2);
+}
+.vb-legit:not(:disabled):hover {
+  background: rgba(48,209,88,0.15);
+  border-color: rgba(48,209,88,0.35);
+  box-shadow: 0 0 20px rgba(48,209,88,0.2);
+  transform: translateY(-1px);
+}
+
+.verdict-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.verdict-btn.selected-threat {
+  background: rgba(255,69,58,0.2);
+  border-color: var(--red);
+  box-shadow: 0 0 24px var(--red-glow);
+}
+
+.verdict-btn.selected-legit {
+  background: rgba(48,209,88,0.18);
+  border-color: var(--green);
+}
+
+/* Pulse animation on verdict */
+@keyframes verdictPulse {
+  0%   { box-shadow: 0 0 0 0 var(--red-glow); }
+  70%  { box-shadow: 0 0 0 12px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.pulse-red { animation: verdictPulse 0.5s ease; }
+
+@keyframes verdictPulseGreen {
+  0%   { box-shadow: 0 0 0 0 rgba(48,209,88,0.4); }
+  70%  { box-shadow: 0 0 0 12px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.pulse-green { animation: verdictPulseGreen 0.5s ease; }
+
+/* ── RESULT MODAL ── */
+.result-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.result-backdrop.show { opacity: 1; pointer-events: all; }
+
+.result-modal {
+  background: #1a1a1e;
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 460px; width: 90%;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  transform: scale(0.94) translateY(10px);
+  transition: transform 0.3s var(--spring), opacity 0.25s;
+  opacity: 0;
+}
+.result-backdrop.show .result-modal {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+.result-icon-wrap {
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  margin: 0 auto 16px;
+}
+
+.ri-correct { background: var(--green-soft); border: 1px solid rgba(48,209,88,0.25); }
+.ri-wrong   { background: var(--red-soft);   border: 1px solid rgba(255,69,58,0.25); }
+
+.result-modal h2 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.result-modal h2.correct { color: var(--green); }
+.result-modal h2.wrong   { color: var(--red); }
+
+.result-pts {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text3);
+  margin-bottom: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.result-exp {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+
+.flags-list { margin-bottom: 20px; }
+.flags-title {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+
+.flag-item {
+  display: flex; gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px; color: var(--text2);
+  line-height: 1.4;
+}
+.flag-item:last-child { border: none; }
+.flag-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--red);
+  flex-shrink: 0; margin-top: 5px;
+}
+
+.result-next {
+  width: 100%;
+  padding: 12px;
+  background: var(--text);
+  color: var(--bg);
+  border: none; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600;
+  font-family: var(--font); cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.result-next:hover { opacity: 0.9; }
+.result-next:active { transform: scale(0.99); }
+
+/* ── LOADING ── */
+.loading-view {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 18px;
+  padding: 40px;
+}
+
+.loader-ring {
+  width: 40px; height: 40px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--text);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loader-text {
+  font-size: 14px;
+  color: var(--text2);
+  font-weight: 500;
+}
+
+.loader-steps {
+  display: flex; flex-direction: column; gap: 5px;
+  font-size: 12px;
+  color: var(--text3);
+}
+
+.ls-step { display: flex; align-items: center; gap: 7px; }
+.ls-step.done { color: var(--green); }
+.ls-step.active { color: var(--text2); }
+.ls-step::before { content: '—'; color: inherit; }
+.ls-step.done::before { content: '✓'; }
+
+/* Empty */
+.empty-pane {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px; padding: 40px;
+  text-align: center;
+}
+.ep-icon { font-size: 36px; margin-bottom: 4px; }
+.ep-title { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+.ep-desc  { font-size: 13px; color: var(--text3); max-width: 280px; line-height: 1.6; }
+
+/* Brief */
+.brief-scroll { flex:1; overflow-y:auto; padding:28px 32px; }
+.brief-scroll::-webkit-scrollbar { width:0; }
+.brief-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:12px; max-width:720px; margin:0 auto;
+}
+.brief-card {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--radius); padding:18px;
+}
+.brief-card h3 {
+  font-size:11px; font-weight:600; text-transform:uppercase;
+  letter-spacing:0.08em; color:var(--text3); margin-bottom:12px;
+}
+.brief-card p { font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:7px; }
+.brief-card p:last-child { margin-bottom:0; }
+
+/* Final screen */
+.final-screen {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:40px; text-align:center; gap:6px;
+}
+.fs-score {
+  font-size:64px; font-weight:800; letter-spacing:-3px;
+  font-variant-numeric:tabular-nums;
+  background: linear-gradient(135deg, var(--text) 0%, var(--text2) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text; line-height:1; margin-bottom:4px;
+}
+.fs-label { font-size:13px; color:var(--text3); margin-bottom:24px; }
+.fs-stats {
+  display:flex; gap:12px; margin-bottom:28px;
+}
+.fs-stat {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--radius-sm); padding:14px 20px; text-align:center;
+}
+.fs-stat .fss-v { font-size:22px; font-weight:700; letter-spacing:-0.5px; }
+.fs-stat .fss-l { font-size:11px; color:var(--text3); margin-top:2px; }
+</style>
+</head>
+<body>
+
+<!-- Result Modal -->
+<div class="result-backdrop" id="resultBackdrop">
+  <div class="result-modal">
+    <div class="result-icon-wrap" id="riWrap">
+      <span id="riEmoji">🎯</span>
+    </div>
+    <h2 id="rmTitle" class="correct">—</h2>
+    <div class="result-pts" id="rmPts">—</div>
+    <div class="result-exp" id="rmExp">—</div>
+    <div class="flags-list" id="rmFlags"></div>
+    <button class="result-next" id="rmNext">Continue →</button>
+  </div>
+</div>
+
+<!-- Topbar -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-mark">🛡</div>
+    <span class="logo-name">CyberSage</span>
+    <span class="logo-version">v1</span>
+  </div>
+  <div class="topbar-sep"></div>
+  <div class="live-badge"><div class="live-dot"></div>Live Session</div>
+  <div class="topbar-right">
+    <div class="score-pill">Score <strong id="scoreVal">0</strong></div>
+    <div class="progress-text" id="progressVal">0 / 0</div>
+  </div>
+</header>
+
+<div class="shell">
+  <!-- Left panel -->
+  <aside class="left-panel">
+    <div class="panel-section">
+      <div class="panel-label">Operative</div>
+      <div class="profile-block">
+        <div class="profile-av">👤</div>
+        <div class="profile-info">
+          <div class="p-name" id="pName">—</div>
+          <div class="p-role" id="pRole">Not configured</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="left-body">
+      <div class="section-head">Scenarios</div>
+      <div id="scenarioList">
+        <div style="font-size:12px;color:var(--text3);padding:4px">Configure profile to begin</div>
+      </div>
+
+      <div class="section-head" style="margin-top:20px">Session</div>
+      <div class="stat-grid">
+        <div class="stat-tile">
+          <div class="sv" style="color:var(--green)" id="stCorrect">0</div>
+          <div class="sl">Correct</div>
+        </div>
+        <div class="stat-tile">
+          <div class="sv" style="color:var(--red)" id="stWrong">0</div>
+          <div class="sl">Wrong</div>
+        </div>
+        <div class="stat-tile">
+          <div class="sv" id="stAcc">—</div>
+          <div class="sl">Accuracy</div>
+        </div>
+        <div class="stat-tile">
+          <div class="sv" id="stConf">—</div>
+          <div class="sl">Avg Conf.</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-area">
+    <div class="tab-bar">
+      <div class="tab-btn active" onclick="switchTab('setup',this)">Setup</div>
+      <div class="tab-btn" onclick="switchTab('game',this)">Training</div>
+      <div class="tab-btn" onclick="switchTab('brief',this)">Threat Brief</div>
+    </div>
+
+    <!-- Setup -->
+    <div class="view active" id="setupView">
+      <div class="setup-scroll">
+        <div class="setup-hero">
+          <div class="hero-eyebrow">🔗 Work IQ · Microsoft Graph · AI-Powered</div>
+          <h1>Train like the<br>attack is real.</h1>
+          <p>CyberSage uses your actual work context to generate personalized social engineering simulations — phishing emails that reference your real projects, colleagues, and manager.</p>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-card">
+            <div class="fc-head">
+              <div class="fc-icon" style="background:var(--blue-soft)">🧑</div>
+              <h3>Your Identity</h3>
+            </div>
+            <div class="field"><label>Full name</label><input id="f-name" placeholder="Joshua Appiah"/></div>
+            <div class="field"><label>Job title</label><input id="f-role" placeholder="SOC Analyst"/></div>
+            <div class="field"><label>Department</label><input id="f-dept" placeholder="Information Security"/></div>
+          </div>
+
+          <div class="form-card">
+            <div class="fc-head">
+              <div class="fc-icon" style="background:rgba(191,90,242,0.1)">🏢</div>
+              <h3>Work Context</h3>
+            </div>
+            <div class="field"><label>Company</label><input id="f-co" placeholder="JoshCorp"/></div>
+            <div class="field"><label>Manager's name</label><input id="f-mgr" placeholder="Sarah Mitchell"/></div>
+            <div class="field"><label>Current project</label><input id="f-proj" placeholder="Q3 Security Audit"/></div>
+          </div>
+
+          <div class="form-card">
+            <div class="fc-head">
+              <div class="fc-icon" style="background:var(--amber-soft)">🔗</div>
+              <h3>Work IQ / Microsoft Graph</h3>
+            </div>
+            <div class="field"><label>Client ID</label><input id="f-cid" placeholder="xxxxxxxx-xxxx-xxxx-xxxx"/></div>
+            <div class="field"><label>Client secret</label><input id="f-cs" type="password" placeholder="••••••••••"/></div>
+            <div class="field"><label>Tenant ID</label><input id="f-tid" placeholder="xxxxxxxx-xxxx-xxxx-xxxx"/></div>
+          </div>
+
+          <div class="form-card">
+            <div class="fc-head">
+              <div class="fc-icon" style="background:var(--green-soft)">🎮</div>
+              <h3>Training Config</h3>
+            </div>
+            <div class="field"><label>Difficulty</label>
+              <select id="f-diff">
+                <option value="easy">Easy — Obvious red flags</option>
+                <option value="medium" selected>Medium — Realistic attacks</option>
+                <option value="hard">Hard — Expert deception</option>
+              </select>
+            </div>
+            <div class="field"><label>Scenarios</label>
+              <select id="f-count">
+                <option value="3" selected>3 scenarios</option>
+                <option value="5">5 scenarios</option>
+              </select>
+            </div>
+            <div class="field"><label>Attack types</label>
+              <select id="f-types">
+                <option value="mixed">Mixed — All types</option>
+                <option value="phishing">Phishing only</option>
+                <option value="social">Social engineering only</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="setup-cta">
+          <button class="btn-ghost" onclick="useDemo()">Use demo profile</button>
+          <button class="btn-cta" id="startBtn" onclick="startSession()">Generate Training Session →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game -->
+    <div class="view" id="gameView">
+      <div class="game-layout" id="gameLayout">
+        <div class="content-pane" id="contentPane">
+          <div class="empty-pane">
+            <div class="ep-icon">🎯</div>
+            <div class="ep-title">No session active</div>
+            <div class="ep-desc">Set up your profile and generate a training session to begin.</div>
+          </div>
+        </div>
+        <div class="analysis-panel">
+          <div class="ap-header">
+            <div class="ap-title">Threat Analysis</div>
+            <div class="ap-subtitle">Examine the scenario. Set your confidence and deliver your verdict.</div>
+          </div>
+          <div class="ap-body">
+            <div class="indicator-grid" id="indicatorGrid">
+              <div style="font-size:12px;color:var(--text3)">Generate a scenario to begin.</div>
+            </div>
+            <div class="conf-section">
+              <div class="conf-header">
+                <span class="conf-label">Confidence</span>
+                <span class="conf-value" id="confDisplay">50%</span>
+              </div>
+              <input type="range" id="confSlider" min="0" max="100" value="50"
+                oninput="document.getElementById('confDisplay').textContent=this.value+'%'">
+            </div>
+            <div class="verdict-section">
+              <div class="verdict-label">Your verdict</div>
+              <button class="verdict-btn vb-threat" id="btnThreat" onclick="submitVerdict(true)" disabled>
+                🚨 This is a THREAT
+              </button>
+              <button class="verdict-btn vb-legit" id="btnLegit" onclick="submitVerdict(false)" disabled>
+                ✅ This is LEGITIMATE
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Brief -->
+    <div class="view" id="briefView">
+      <div class="brief-scroll">
+        <div style="max-width:720px;margin:0 auto">
+          <h2 style="font-size:22px;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px">Threat Brief</h2>
+          <p style="font-size:13px;color:var(--text3);margin-bottom:24px">Know what to look for before an attack finds you.</p>
+          <div class="brief-grid">
+            <div class="brief-card">
+              <h3>Phishing Indicators</h3>
+              <p>🚩 Sender domain doesn't match display name</p>
+              <p>🚩 Urgency language ("Act now", "Expires soon")</p>
+              <p>🚩 Requests for credentials or MFA codes</p>
+              <p>🚩 URLs that mismatch on hover</p>
+              <p>🚩 Generic or slightly wrong name</p>
+            </div>
+            <div class="brief-card">
+              <h3>Social Engineering</h3>
+              <p>🎭 Impersonating authority (CEO, IT, HR)</p>
+              <p>🎭 Artificial urgency or fear creation</p>
+              <p>🎭 Using real context to build trust</p>
+              <p>🎭 Pretexting — fabricated scenarios</p>
+              <p>🎭 Quid pro quo — offering help for access</p>
+            </div>
+            <div class="brief-card">
+              <h3>Vishing Attacks</h3>
+              <p>📞 Caller ID spoofing</p>
+              <p>📞 IT helpdesk asking for your password</p>
+              <p>📞 Pressure before you can verify</p>
+              <p>📞 Personal details used to build false trust</p>
+            </div>
+            <div class="brief-card">
+              <h3>Your Defense</h3>
+              <p>✅ Verify identity through a separate channel</p>
+              <p>✅ Never share passwords or MFA codes</p>
+              <p>✅ Report suspicious comms to security team</p>
+              <p>✅ When in doubt — escalate, not your fault</p>
+              <p>✅ Hover links before clicking</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ── State ──
+let profile = {};
+let scenarios = [];
+let idx = 0;
+let score = 0, correct = 0, wrong = 0;
+let confs = [];
+
+// ── Tabs ──
+function switchTab(id, el) {
+  document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id + 'View').classList.add('active');
+}
+
+function switchTabById(id) {
+  const tabs = document.querySelectorAll('.tab-btn');
+  const views = ['setup','game','brief'];
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  tabs.forEach(t => t.classList.remove('active'));
+  const i = views.indexOf(id);
+  if (i >= 0) { tabs[i].classList.add('active'); document.getElementById(id+'View').classList.add('active'); }
+}
+
+// ── Demo ──
+function useDemo() {
+  document.getElementById('f-name').value  = 'Joshua Appiah';
+  document.getElementById('f-role').value  = 'SOC Analyst';
+  document.getElementById('f-dept').value  = 'Information Security';
+  document.getElementById('f-co').value    = 'JoshCorp';
+  document.getElementById('f-mgr').value   = 'Sarah Mitchell';
+  document.getElementById('f-proj').value  = 'Q3 Security Audit';
+}
+
+// ── Start ──
+async function startSession() {
+  const name = document.getElementById('f-name').value.trim();
+  const role = document.getElementById('f-role').value.trim();
+  const co   = document.getElementById('f-co').value.trim();
+  if (!name || !role || !co) { alert('Please fill in name, role, and company.'); return; }
+
+  profile = {
+    name, role,
+    dept:  document.getElementById('f-dept').value.trim(),
+    co, mgr: document.getElementById('f-mgr').value.trim(),
+    proj: document.getElementById('f-proj').value.trim(),
+    diff: document.getElementById('f-diff').value,
+    count: parseInt(document.getElementById('f-count').value),
+    types: document.getElementById('f-types').value,
+    cid:  document.getElementById('f-cid').value.trim(),
+    cs:   document.getElementById('f-cs').value.trim(),
+    tid:  document.getElementById('f-tid').value.trim(),
+  };
+
+  // Update profile in sidebar
+  document.getElementById('pName').textContent = name;
+  document.getElementById('pRole').textContent = `${role} · ${profile.dept || co}`;
+
+  // Switch to game
+  switchTabById('game');
+
+  // Show loading
+  document.getElementById('contentPane').innerHTML = `
+    <div class="loading-view">
+      <div class="loader-ring"></div>
+      <div class="loader-text">Generating your scenarios…</div>
+      <div class="loader-steps" id="loaderSteps">
+        <div class="ls-step active">Pulling Work IQ context</div>
+        <div class="ls-step">Analyzing threat vectors for ${role}</div>
+        <div class="ls-step">Crafting ${profile.count} personalized scenarios</div>
+        <div class="ls-step">Initializing session</div>
+      </div>
+    </div>`;
+
+  const steps = document.querySelectorAll('.ls-step');
+  let si = 0;
+  const stInt = setInterval(() => {
+    if (si < steps.length) {
+      if (si > 0) steps[si-1].classList.remove('active');
+      steps[si].classList.add('active','done');
+      si++;
+    } else clearInterval(stInt);
+  }, 500);
+
+  await generateScenarios();
+}
+
+async function generateScenarios() {
+  const diffMap = {
+    easy: 'obvious red flags beginners can spot — poor grammar, generic greetings, obvious fake domains',
+    medium: 'realistic and convincing attacks requiring careful analysis',
+    hard: 'extremely sophisticated attacks even security pros might miss — perfect grammar, plausible context, near-perfect spoofing'
+  };
+
+  const prompt = `Generate ${profile.count} hyper-personalized social engineering training scenarios for:
+Name: ${profile.name} | Role: ${profile.role} | Dept: ${profile.dept} | Company: ${profile.co}
+Manager: ${profile.mgr} | Project: ${profile.proj}
+Difficulty: ${profile.diff} — ${diffMap[profile.diff]}
+Types: ${profile.types}
+
+Return ONLY a valid JSON array. No markdown. No explanation. Each object:
+{
+  "id": number,
+  "type": "phishing"|"social"|"vishing"|"pretexting",
+  "difficulty": "${profile.diff}",
+  "isThreat": true|false,
+  "title": "short title",
+  "artifact": {
+    "kind": "email"|"chat",
+    "from_name": "name",
+    "from_email": "email@domain.com",
+    "to": "${profile.name}",
+    "subject": "subject if email",
+    "body": "full realistic message — use real name ${profile.name}, company ${profile.co}, manager ${profile.mgr}, project ${profile.proj}",
+    "timestamp": "Today, 9:47 AM"
+  },
+  "clues": ["clue 1","clue 2","clue 3","clue 4"],
+  "redFlags": ["red flag 1","red flag 2","red flag 3"],
+  "explanation": "2-3 sentence explanation",
+  "scoreValue": 100
+}
+Mix ~70% threats, ~30% legitimate. Use the REAL name, company, manager, project to make it feel frighteningly personal.`;
+
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer YOUR_OPENROUTER_API_KEY_HERE'
+      },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        max_tokens: 2000,
+        messages: [
+          { role: 'system', content: 'You are a cybersecurity training expert. Return valid JSON arrays only. No markdown. No extra text.' },
+          { role: 'user', content: prompt }
+        ]
+      })
+    });
+
+    const data = await res.json();
+    let text = '';
+    if (data.choices?.[0]) text = data.choices[0].message.content.trim();
+    else if (data.error) throw new Error(data.error.message);
+    else throw new Error('Unexpected: ' + JSON.stringify(data).substring(0,150));
+
+    text = text.replace(/```json|```/g,'').trim();
+    const s = text.indexOf('['), e = text.lastIndexOf(']');
+    if (s !== -1 && e !== -1) text = text.substring(s, e+1);
+    scenarios = JSON.parse(text);
+    idx = 0;
+    buildSidebar();
+    loadScenario(0);
+
+  } catch(err) {
+    document.getElementById('contentPane').innerHTML = `
+      <div class="empty-pane">
+        <div class="ep-icon">⚠️</div>
+        <div class="ep-title">Generation Failed</div>
+        <div class="ep-desc" style="font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;text-align:left;max-width:340px">${err.message}</div>
+      </div>`;
+  }
+}
+
+function buildSidebar() {
+  const typeIcon = { phishing:'📧', social:'💬', vishing:'📞', pretexting:'🎭' };
+  const diffColor = { easy: 'var(--green)', medium: 'var(--amber)', hard: 'var(--red)' };
+  const typeBg = { phishing:'var(--red-soft)', social:'var(--amber-soft)', vishing:'var(--blue-soft)', pretexting:'rgba(191,90,242,0.1)' };
+
+  document.getElementById('scenarioList').innerHTML = scenarios.map((s,i) => `
+    <div class="scenario-row ${i===0?'active':''}" id="sr-${i}" onclick="loadScenario(${i})">
+      <div class="sr-icon" style="background:${typeBg[s.type]||'var(--glass)'}">${typeIcon[s.type]||'📄'}</div>
+      <div class="sr-info">
+        <div class="sr-title">${s.title}</div>
+        <div class="sr-meta">${s.type}</div>
+      </div>
+      <div class="diff-dot" style="background:${diffColor[s.difficulty]||'var(--text3)'}"></div>
+    </div>`).join('');
+
+  document.getElementById('progressVal').textContent = `0 / ${scenarios.length}`;
+}
+
+function loadScenario(i) {
+  if (i >= scenarios.length) { showFinal(); return; }
+  idx = i;
+  const s = scenarios[i];
+
+  document.querySelectorAll('.scenario-row').forEach((r,j) => r.classList.toggle('active', j===i));
+  document.getElementById('btnThreat').disabled = false;
+  document.getElementById('btnLegit').disabled  = false;
+  document.getElementById('btnThreat').classList.remove('selected-threat','pulse-red');
+  document.getElementById('btnLegit').classList.remove('selected-legit','pulse-green');
+  document.getElementById('confSlider').value = 50;
+  document.getElementById('confDisplay').textContent = '50%';
+
+  const typeCls = { phishing:'tb-phishing', social:'tb-social', vishing:'tb-vishing', pretexting:'tb-pretexting' };
+
+  // Build artifact
+  let artifactHTML = '';
+  if (s.artifact.kind === 'email') {
+    const bodyParas = s.artifact.body.split('\n').filter(l=>l.trim())
+      .map(l => `<p>${l.replace(/https?:\/\/\S+/g, m => `<a class="email-link" href="#">${m}</a>`)}</p>`).join('');
+    artifactHTML = `
+      <div class="email-card">
+        <div class="email-chrome">
+          <div class="chrome-dots">
+            <div class="chrome-dot" style="background:#ff5f57"></div>
+            <div class="chrome-dot" style="background:#febc2e"></div>
+            <div class="chrome-dot" style="background:#28c840"></div>
+          </div>
+          <span class="chrome-label">Inbox — ${profile.co} Mail</span>
+        </div>
+        <div class="email-meta">
+          <div class="meta-row"><span class="meta-key">From</span><span class="meta-val warn">${s.artifact.from_name} &lt;${s.artifact.from_email}&gt;</span></div>
+          <div class="meta-row"><span class="meta-key">To</span><span class="meta-val">${s.artifact.to}</span></div>
+          <div class="meta-row subject-row"><span class="meta-key">Subject</span><span class="meta-val">${s.artifact.subject||'(no subject)'}</span></div>
+          <div class="meta-row"><span class="meta-key">Time</span><span class="meta-val" style="color:var(--text3)">${s.artifact.timestamp}</span></div>
+        </div>
+        <div class="email-body-wrap">${bodyParas}</div>
+        <div class="email-actions">
+          <button class="email-act-btn eab-reply">↩ Reply</button>
+          <button class="email-act-btn eab-fwd">→ Forward</button>
+          <button class="email-act-btn eab-delete">🗑 Delete</button>
+        </div>
+      </div>`;
+  } else {
+    const lines = s.artifact.body.split('\n').filter(l=>l.trim());
+    const msgs = lines.map(l => {
+      const isYou = l.toLowerCase().startsWith('you:') || l.toLowerCase().startsWith(profile.name.split(' ')[0].toLowerCase()+':');
+      const txt = l.replace(/^[^:]+:\s*/,'');
+      return `<div class="cm ${isYou?'you':'them'}">
+        <div class="cm-av ${isYou?'you-av':'them-av'}">${isYou?'👤':'💬'}</div>
+        <div class="cm-bubble">${txt}</div>
+      </div>`;
+    }).join('');
+    artifactHTML = `
+      <div class="chat-card">
+        <div class="chat-chrome">
+          <div class="chat-av">💬</div>
+          <div class="chat-chrome-info">
+            <div class="cc-name">${s.artifact.from_name}</div>
+            <div class="cc-status">● Active</div>
+          </div>
+          <span style="margin-left:auto;font-size:11px;color:var(--text3)">${s.artifact.timestamp}</span>
+        </div>
+        <div class="chat-messages">${msgs||`<div class="cm them"><div class="cm-av them-av">💬</div><div class="cm-bubble">${s.artifact.body}</div></div>`}</div>
+      </div>`;
+  }
+
+  document.getElementById('contentPane').innerHTML = `
+    <div class="scenario-eyebrow">
+      <span class="type-badge ${typeCls[s.type]||''}">${s.type}</span>
+      <span class="scenario-title">${s.title}</span>
+    </div>
+    ${artifactHTML}`;
+
+  // Build indicator cards
+  const icColors = ['var(--red-soft)','var(--amber-soft)','var(--blue-soft)','rgba(191,90,242,0.1)'];
+  const icIcons  = ['🔍','⚠️','🔗','🎯'];
+  document.getElementById('indicatorGrid').innerHTML = s.clues.map((c,i) => `
+    <div class="indicator-card" style="animation-delay:${i*0.06}s">
+      <div class="ic-icon" style="background:${icColors[i%icColors.length]}">${icIcons[i%icIcons.length]}</div>
+      <div class="ic-body">
+        <div class="ic-label">Clue ${i+1}</div>
+        <div class="ic-desc">${c}</div>
+      </div>
+    </div>`).join('');
+}
+
+function submitVerdict(isThreat) {
+  const s = scenarios[idx];
+  const conf = parseInt(document.getElementById('confSlider').value);
+  const isCorrect = isThreat === s.isThreat;
+
+  confs.push(conf);
+  let pts = 0;
+  if (isCorrect) {
+    pts = Math.round(s.scoreValue * (0.5 + conf/200));
+    score += pts; correct++;
+  } else {
+    pts = -Math.round(s.scoreValue * 0.25);
+    score = Math.max(0, score + pts); wrong++;
+  }
+  document.getElementById('scoreVal').textContent = score;
+
+  // Tactile feedback
+  const btn = isThreat ? document.getElementById('btnThreat') : document.getElementById('btnLegit');
+  btn.classList.add(isThreat ? 'selected-threat' : 'selected-legit');
+  btn.classList.add(isThreat ? 'pulse-red' : 'pulse-green');
+  document.getElementById('btnThreat').disabled = true;
+  document.getElementById('btnLegit').disabled  = true;
+
+  // Mark sidebar
+  const sr = document.getElementById(`sr-${idx}`);
+  if (sr) sr.classList.add('done');
+
+  updateStats();
+
+  // Show result
+  setTimeout(() => {
+    document.getElementById('riWrap').className = `result-icon-wrap ${isCorrect?'ri-correct':'ri-wrong'}`;
+    document.getElementById('riEmoji').textContent = isCorrect ? (isThreat?'🎯':'✅') : '❌';
+    document.getElementById('rmTitle').textContent = isCorrect ? 'Correct!' : 'Missed it.';
+    document.getElementById('rmTitle').className = `${isCorrect?'correct':'wrong'}`;
+    document.getElementById('rmPts').textContent = `${pts>=0?'+':''}${pts} points · ${conf}% confidence`;
+    document.getElementById('rmExp').textContent = s.explanation;
+    document.getElementById('rmFlags').innerHTML = `
+      <div class="flags-title">Red flags in this scenario</div>
+      ${s.redFlags.map(f=>`<div class="flag-item"><div class="flag-dot"></div><span>${f}</span></div>`).join('')}`;
+    document.getElementById('rmNext').onclick = () => {
+      document.getElementById('resultBackdrop').classList.remove('show');
+      const done = correct + wrong;
+      document.getElementById('progressVal').textContent = `${done} / ${scenarios.length}`;
+      loadScenario(idx + 1);
+    };
+    document.getElementById('resultBackdrop').classList.add('show');
+  }, 300);
+}
+
+function showFinal() {
+  const acc = correct+wrong > 0 ? Math.round(correct/(correct+wrong)*100) : 0;
+  document.getElementById('contentPane').innerHTML = `
+    <div class="final-screen">
+      <div class="fs-score">${score}</div>
+      <div class="fs-label">Final Score — Session Complete</div>
+      <div class="fs-stats">
+        <div class="fs-stat"><div class="fss-v" style="color:var(--green)">${acc}%</div><div class="fss-l">Accuracy</div></div>
+        <div class="fs-stat"><div class="fss-v">${correct}/${correct+wrong}</div><div class="fss-l">Correct</div></div>
+        <div class="fs-stat"><div class="fss-v">${confs.length?Math.round(confs.reduce((a,b)=>a+b,0)/confs.length):0}%</div><div class="fss-l">Avg Confidence</div></div>
+      </div>
+      <button class="btn-cta" style="max-width:260px" onclick="resetSession()">Start New Session →</button>
+    </div>`;
+}
+
+function resetSession() {
+  scenarios=[]; idx=0; score=0; correct=0; wrong=0; confs=[];
+  document.getElementById('scoreVal').textContent='0';
+  document.getElementById('progressVal').textContent='0 / 0';
+  document.getElementById('scenarioList').innerHTML='<div style="font-size:12px;color:var(--text3);padding:4px">Configure profile to begin</div>';
+  updateStats();
+  switchTabById('setup');
+}
+
+function updateStats() {
+  const total = correct + wrong;
+  document.getElementById('stCorrect').textContent = correct;
+  document.getElementById('stWrong').textContent   = wrong;
+  document.getElementById('stAcc').textContent     = total ? Math.round(correct/total*100)+'%' : '—';
+  document.getElementById('stConf').textContent    = confs.length ? Math.round(confs.reduce((a,b)=>a+b,0)/confs.length)+'%' : '—';
+}
+</script>
+</body>
+</html>
