@@ -1227,6 +1227,40 @@ input[type=range]::-webkit-slider-thumb:hover {
     </div>
 
     <!-- Setup -->
+    <!-- Admin Modal -->
+    <div class="result-backdrop" id="adminModal" style="z-index:300">
+      <div class="result-modal" style="max-width:500px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <div style="font-size:24px">⚙️</div>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:700">Admin Configuration</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px">Work IQ · Microsoft Graph — IT Admin only</div>
+          </div>
+          <button onclick="closeAdminModal()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer">✕</button>
+        </div>
+        <div style="background:var(--amber-soft);border:1px solid rgba(255,214,10,0.2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--amber);margin:14px 0;line-height:1.5">
+          ⚠️ These credentials are stored locally in your browser only and never visible to employees.
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:5px;font-weight:500">Client ID</label>
+          <input id="a-cid" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:monospace;font-size:12px;color:var(--text);outline:none"/>
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:5px;font-weight:500">Client Secret</label>
+          <input id="a-cs" type="password" placeholder="••••••••••••••••" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:monospace;font-size:12px;color:var(--text);outline:none"/>
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:5px;font-weight:500">Tenant ID</label>
+          <input id="a-tid" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:monospace;font-size:12px;color:var(--text);outline:none"/>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-ghost" style="flex:1" onclick="closeAdminModal()">Cancel</button>
+          <button class="btn-cta" style="flex:2" onclick="saveAdminConfig()">Save Configuration</button>
+        </div>
+        <div id="adminStatus" style="font-size:11px;color:var(--green);text-align:center;margin-top:10px;display:none">✓ Configuration saved to browser</div>
+      </div>
+    </div>
+
     <div class="view active" id="setupView">
       <div class="setup-scroll">
         <div class="setup-hero">
@@ -1235,15 +1269,22 @@ input[type=range]::-webkit-slider-thumb:hover {
           <p>CyberSage uses your actual work context to generate personalized social engineering simulations — phishing emails that reference your real projects, colleagues, and manager.</p>
         </div>
 
+        <!-- Work IQ status bar -->
+        <div style="max-width:680px;margin:0 auto 16px;display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 16px">
+          <div id="wiqDot" style="width:7px;height:7px;border-radius:50%;background:var(--text3);flex-shrink:0"></div>
+          <span id="wiqStatus" style="font-size:12px;color:var(--text3);flex:1">Work IQ not configured — scenarios will use your profile details</span>
+          <button onclick="openAdminModal()" style="font-size:11px;font-weight:600;color:var(--amber);background:var(--amber-soft);border:1px solid rgba(255,214,10,0.2);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:var(--font)">⚙ Admin</button>
+        </div>
+
         <div class="form-grid">
           <div class="form-card">
             <div class="fc-head">
               <div class="fc-icon" style="background:var(--blue-soft)">🧑</div>
               <h3>Your Identity</h3>
             </div>
-            <div class="field"><label>Full name</label><input id="f-name" placeholder="Joshua Appiah"/></div>
-            <div class="field"><label>Job title</label><input id="f-role" placeholder="SOC Analyst"/></div>
-            <div class="field"><label>Department</label><input id="f-dept" placeholder="Information Security"/></div>
+            <div class="field"><label>Full name</label><input id="f-name" placeholder="e.g. Joshua Appiah"/></div>
+            <div class="field"><label>Job title</label><input id="f-role" placeholder="e.g. SOC Analyst"/></div>
+            <div class="field"><label>Department</label><input id="f-dept" placeholder="e.g. Information Security"/></div>
           </div>
 
           <div class="form-card">
@@ -1251,52 +1292,44 @@ input[type=range]::-webkit-slider-thumb:hover {
               <div class="fc-icon" style="background:rgba(191,90,242,0.1)">🏢</div>
               <h3>Work Context</h3>
             </div>
-            <div class="field"><label>Company</label><input id="f-co" placeholder="JoshCorp"/></div>
-            <div class="field"><label>Manager's name</label><input id="f-mgr" placeholder="Sarah Mitchell"/></div>
-            <div class="field"><label>Current project</label><input id="f-proj" placeholder="Q3 Security Audit"/></div>
+            <div class="field"><label>Company</label><input id="f-co" placeholder="e.g. JoshCorp"/></div>
+            <div class="field"><label>Manager's name</label><input id="f-mgr" placeholder="e.g. Sarah Mitchell"/></div>
+            <div class="field"><label>Current project</label><input id="f-proj" placeholder="e.g. Q3 Security Audit"/></div>
           </div>
 
-          <div class="form-card">
-            <div class="fc-head">
-              <div class="fc-icon" style="background:var(--amber-soft)">🔗</div>
-              <h3>Work IQ / Microsoft Graph</h3>
-            </div>
-            <div class="field"><label>Client ID</label><input id="f-cid" placeholder="xxxxxxxx-xxxx-xxxx-xxxx"/></div>
-            <div class="field"><label>Client secret</label><input id="f-cs" type="password" placeholder="••••••••••"/></div>
-            <div class="field"><label>Tenant ID</label><input id="f-tid" placeholder="xxxxxxxx-xxxx-xxxx-xxxx"/></div>
-          </div>
-
-          <div class="form-card">
+          <div class="form-card" style="grid-column:1/-1">
             <div class="fc-head">
               <div class="fc-icon" style="background:var(--green-soft)">🎮</div>
               <h3>Training Config</h3>
             </div>
-            <div class="field"><label>Difficulty</label>
-              <select id="f-diff">
-                <option value="easy">Easy — Obvious red flags</option>
-                <option value="medium" selected>Medium — Realistic attacks</option>
-                <option value="hard">Hard — Expert deception</option>
-              </select>
-            </div>
-            <div class="field"><label>Scenarios</label>
-              <select id="f-count">
-                <option value="3" selected>3 scenarios</option>
-                <option value="5">5 scenarios</option>
-              </select>
-            </div>
-            <div class="field"><label>Attack types</label>
-              <select id="f-types">
-                <option value="mixed">Mixed — All types</option>
-                <option value="phishing">Phishing only</option>
-                <option value="social">Social engineering only</option>
-              </select>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+              <div class="field" style="margin:0"><label>Difficulty</label>
+                <select id="f-diff">
+                  <option value="easy">Easy — Obvious red flags</option>
+                  <option value="medium" selected>Medium — Realistic attacks</option>
+                  <option value="hard">Hard — Expert deception</option>
+                </select>
+              </div>
+              <div class="field" style="margin:0"><label>Number of scenarios</label>
+                <select id="f-count">
+                  <option value="3" selected>3 scenarios</option>
+                  <option value="5">5 scenarios</option>
+                </select>
+              </div>
+              <div class="field" style="margin:0"><label>Attack focus</label>
+                <select id="f-types">
+                  <option value="mixed">Mixed — All attack types</option>
+                  <option value="phishing">Phishing emails only</option>
+                  <option value="social">Social engineering only</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
 
         <div class="setup-cta">
           <button class="btn-ghost" onclick="useDemo()">Use demo profile</button>
-          <button class="btn-cta" id="startBtn" onclick="startSession()">Generate Training Session →</button>
+          <button class="btn-cta" id="startBtn" onclick="startSession()">Start Training Session →</button>
         </div>
       </div>
     </div>
@@ -1390,10 +1423,51 @@ input[type=range]::-webkit-slider-thumb:hover {
 <script>
 // ── State ──
 let profile = {};
+
+// ── Admin Modal ──
+function openAdminModal() {
+  // Pre-fill from localStorage if saved
+  const saved = JSON.parse(localStorage.getItem('cybersage_admin') || '{}');
+  if (saved.cid) document.getElementById('a-cid').value = saved.cid;
+  if (saved.cs)  document.getElementById('a-cs').value  = saved.cs;
+  if (saved.tid) document.getElementById('a-tid').value = saved.tid;
+  document.getElementById('adminModal').classList.add('show');
+}
+
+function closeAdminModal() {
+  document.getElementById('adminModal').classList.remove('show');
+}
+
+function saveAdminConfig() {
+  const cid = document.getElementById('a-cid').value.trim();
+  const cs  = document.getElementById('a-cs').value.trim();
+  const tid = document.getElementById('a-tid').value.trim();
+  if (!cid || !tid) { alert('Client ID and Tenant ID are required.'); return; }
+  localStorage.setItem('cybersage_admin', JSON.stringify({ cid, cs, tid }));
+  // Update status bar
+  document.getElementById('wiqDot').style.background = 'var(--green)';
+  document.getElementById('wiqStatus').textContent = '✓ Work IQ configured — Microsoft Graph connected';
+  document.getElementById('wiqStatus').style.color = 'var(--green)';
+  document.getElementById('adminStatus').style.display = 'block';
+  setTimeout(() => { closeAdminModal(); document.getElementById('adminStatus').style.display = 'none'; }, 1200);
+}
+
+function loadAdminConfig() {
+  const saved = JSON.parse(localStorage.getItem('cybersage_admin') || '{}');
+  if (saved.cid && saved.tid) {
+    document.getElementById('wiqDot').style.background = 'var(--green)';
+    document.getElementById('wiqStatus').textContent = '✓ Work IQ configured — Microsoft Graph connected';
+    document.getElementById('wiqStatus').style.color = 'var(--green)';
+  }
+  return saved;
+}
 let scenarios = [];
 let idx = 0;
 let score = 0, correct = 0, wrong = 0;
 let confs = [];
+
+// Load admin config on startup
+window.addEventListener('load', () => loadAdminConfig());
 
 // ── Tabs ──
 function switchTab(id, el) {
@@ -1429,6 +1503,7 @@ async function startSession() {
   const co   = document.getElementById('f-co').value.trim();
   if (!name || !role || !co) { alert('Please fill in name, role, and company.'); return; }
 
+  const adminCfg = loadAdminConfig();
   profile = {
     name, role,
     dept:  document.getElementById('f-dept').value.trim(),
@@ -1437,9 +1512,9 @@ async function startSession() {
     diff: document.getElementById('f-diff').value,
     count: parseInt(document.getElementById('f-count').value),
     types: document.getElementById('f-types').value,
-    cid:  document.getElementById('f-cid').value.trim(),
-    cs:   document.getElementById('f-cs').value.trim(),
-    tid:  document.getElementById('f-tid').value.trim(),
+    cid:  adminCfg.cid  || '',
+    cs:   adminCfg.cs   || '',
+    tid:  adminCfg.tid  || '',
   };
 
   // Update profile in sidebar
@@ -1572,7 +1647,7 @@ Return ONLY a raw JSON array. Zero markdown. Zero explanation. Start with [ and 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer YOUR_OPENROUTER_API_KEY_HERE'
+        'Authorization': 'Bearer YOUR_OPENROUTER_API_KEY_HERE
       },
       body: JSON.stringify({
         model: 'mistralai/mistral-7b-instruct:free',
