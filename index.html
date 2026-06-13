@@ -1482,34 +1482,90 @@ async function generateScenarios() {
     hard: 'extremely sophisticated attacks even security pros might miss — perfect grammar, plausible context, near-perfect spoofing'
   };
 
-  const prompt = `Generate ${profile.count} hyper-personalized social engineering training scenarios for:
-Name: ${profile.name} | Role: ${profile.role} | Dept: ${profile.dept} | Company: ${profile.co}
-Manager: ${profile.mgr} | Project: ${profile.proj}
-Difficulty: ${profile.diff} — ${diffMap[profile.diff]}
-Types: ${profile.types}
+  // Full attack library — rotated randomly every session for variety
+  const attackLibrary = [
+    { type: 'phishing',    kind: 'email',  theme: 'fake login link to corporate portal' },
+    { type: 'phishing',    kind: 'email',  theme: 'CEO fraud / business email compromise' },
+    { type: 'phishing',    kind: 'email',  theme: 'fake invoice or payment request' },
+    { type: 'phishing',    kind: 'email',  theme: 'fake software update or security alert' },
+    { type: 'phishing',    kind: 'email',  theme: 'fake HR policy requiring personal info' },
+    { type: 'phishing',    kind: 'email',  theme: 'fake vendor email requesting bank detail change' },
+    { type: 'phishing',    kind: 'email',  theme: 'calendar invite with malicious link' },
+    { type: 'phishing',    kind: 'email',  theme: 'fake job offer or LinkedIn recruitment' },
+    { type: 'phishing',    kind: 'email',  theme: 'password reset email that looks legitimate' },
+    { type: 'phishing',    kind: 'email',  theme: 'watering hole attack via industry newsletter' },
+    { type: 'social',      kind: 'chat',   theme: 'IT helpdesk impersonation asking for credentials' },
+    { type: 'social',      kind: 'chat',   theme: 'colleague asking to share sensitive file access' },
+    { type: 'social',      kind: 'chat',   theme: 'fake security team asking to disable MFA' },
+    { type: 'social',      kind: 'chat',   theme: 'insider threat — colleague requesting system access' },
+    { type: 'social',      kind: 'chat',   theme: 'social media impersonation of real colleague' },
+    { type: 'pretexting',  kind: 'chat',   theme: 'caller pretending to be external auditor' },
+    { type: 'pretexting',  kind: 'chat',   theme: 'fake contractor requesting building/system access' },
+    { type: 'pretexting',  kind: 'email',  theme: 'supply chain email from compromised vendor' },
+    { type: 'vishing',     kind: 'chat',   theme: 'phone call pretending to be bank fraud team' },
+    { type: 'vishing',     kind: 'chat',   theme: 'smishing — SMS with urgent account alert' },
+    { type: 'physical',    kind: 'chat',   theme: 'found USB drive in car park — should you plug it in?' },
+    { type: 'physical',    kind: 'chat',   theme: 'QR code on office notice board claiming to be IT' },
+    { type: 'physical',    kind: 'chat',   theme: 'tailgating attempt by unknown person at secure door' },
+    { type: 'ransomware',  kind: 'email',  theme: 'malicious attachment disguised as project document' },
+    { type: 'credential',  kind: 'email',  theme: 'fake MFA verification request from IT security' },
+  ];
 
-Return ONLY a valid JSON array. No markdown. No explanation. Each object:
-{
-  "id": number,
-  "type": "phishing"|"social"|"vishing"|"pretexting",
-  "difficulty": "${profile.diff}",
-  "isThreat": true|false,
-  "title": "short title",
-  "artifact": {
-    "kind": "email"|"chat",
-    "from_name": "name",
-    "from_email": "email@domain.com",
-    "to": "${profile.name}",
-    "subject": "subject if email",
-    "body": "full realistic message — use real name ${profile.name}, company ${profile.co}, manager ${profile.mgr}, project ${profile.proj}",
-    "timestamp": "Today, 9:47 AM"
-  },
-  "clues": ["clue 1","clue 2","clue 3","clue 4"],
-  "redFlags": ["red flag 1","red flag 2","red flag 3"],
-  "explanation": "2-3 sentence explanation",
-  "scoreValue": 100
-}
-Mix ~70% threats, ~30% legitimate. Use the REAL name, company, manager, project to make it feel frighteningly personal.`;
+  // Shuffle the library for this session — guarantees unique mix every time
+  const sessionSeed = Math.random().toString(36).substring(2, 10);
+  const shuffled = [...attackLibrary].sort(() => Math.random() - 0.5);
+  const chosen = shuffled.slice(0, profile.count);
+
+  const scenarioInstructions = chosen.map((a, i) =>
+    `Scenario ${i+1}: type="${a.type}", kind="${a.kind}", theme="${a.theme}"`
+  ).join('\n');
+
+  const prompt = `CYBERSECURITY TRAINING GENERATOR — Session: ${sessionSeed}
+
+Generate exactly ${profile.count} unique scenarios for this employee:
+Name: ${profile.name}
+Role: ${profile.role}
+Department: ${profile.dept}
+Company: ${profile.co}
+Manager: ${profile.mgr}
+Current Project: ${profile.proj}
+Difficulty: ${profile.diff} (${diffMap[profile.diff]})
+
+USE THESE EXACT SCENARIOS IN THIS ORDER:
+${scenarioInstructions}
+
+CRITICAL RULES:
+1. Use the employee's REAL name, company, manager, and project in every scenario to make it personal
+2. Make body text detailed and realistic — minimum 4 sentences
+3. Mix threats and legitimate messages (roughly 70% isThreat:true, 30% isThreat:false)
+4. For physical/USB/QR scenarios use chat kind with a colleague describing the situation
+5. Every scenario must be completely different — no repetition
+6. Difficulty ${profile.diff}: ${diffMap[profile.diff]}
+
+Return ONLY a raw JSON array. Zero markdown. Zero explanation. Start with [ and end with ].
+
+[
+  {
+    "id": 1,
+    "type": "phishing",
+    "difficulty": "${profile.diff}",
+    "isThreat": true,
+    "title": "short descriptive title",
+    "artifact": {
+      "kind": "email",
+      "from_name": "realistic sender name",
+      "from_email": "sender@somedomain.com",
+      "to": "${profile.name}",
+      "subject": "email subject line",
+      "body": "full realistic 4+ sentence message using their real details",
+      "timestamp": "Today, 9:47 AM"
+    },
+    "clues": ["clue 1", "clue 2", "clue 3", "clue 4"],
+    "redFlags": ["red flag 1", "red flag 2", "red flag 3"],
+    "explanation": "2-3 sentence explanation of why this is or is not a threat",
+    "scoreValue": 100
+  }
+]`;
 
   try {
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -1519,7 +1575,7 @@ Mix ~70% threats, ~30% legitimate. Use the REAL name, company, manager, project 
         'Authorization': 'Bearer YOUR_OPENROUTER_API_KEY_HERE'
       },
       body: JSON.stringify({
-        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        model: 'mistralai/mistral-7b-instruct:free',
         max_tokens: 2000,
         messages: [
           { role: 'system', content: 'You are a cybersecurity training expert. Return valid JSON arrays only. No markdown. No extra text.' },
